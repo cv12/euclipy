@@ -1,10 +1,22 @@
 from collections import defaultdict
+from abc import ABC, abstractmethod
+import sympy
 
 class Geometry:
     @classmethod
     @property
     def _registry_key(cls):
         return cls.__name__
+
+class Theorem(ABC):
+    applies_to = NotImplemented
+    @abstractmethod
+    def predicate_satisfied(self):
+        pass
+
+    @abstractmethod
+    def apply_theorem(self):
+        pass
 
 class Registry:
     '''Singleton registry of Geometry instances (GeometricObjects and GeometricMeasures).
@@ -160,6 +172,21 @@ class Triangle(Polygon):
         assert len(points) == 3
         return super().__new__(cls, points)
 
+class TriangleSumTheorem(Theorem):
+    applies_to = Triangle
+    def predicate_satisfied(self, triangle):
+        return sum([1 for a in triangle.angles if a.measure.value == None]) == 1
+
+    def apply_theorem(self, triangle):
+        if self.predicate_satisfied(triangle):
+            missing = [a for a in triangle.angles if a.measure.value == None][0]
+            known_sum = sum([a.measure.value for a in triangle.angles if a.measure.value != None])
+            m = sympy.Symbol(missing.measure.label)
+            missing.measure.value = sympy.solve(m+known_sum-180,m)[0]
+            
+
+
+
 if __name__ == '__main__':
     import pprint
     pp = pprint.PrettyPrinter(indent=4)
@@ -183,4 +210,10 @@ if __name__ == '__main__':
         T3 = Triangle([B, A, C])
     except:
         print('Inconsistent triangle')
+    a1 = T1.angles[0]
+    a2 = T1.angles[1]
+    a1.measure.value = 40
+    a2.measure.value = 90
+    TriangleSumTheorem().apply_theorem(T1)
     pp.pprint(Registry().entries)
+    
