@@ -1,5 +1,4 @@
 from setuptools import setup, find_packages
-import math
  
 classifiers = [
   'Development Status :: 5 - Production/Stable',
@@ -11,7 +10,7 @@ classifiers = [
  
 setup(
   name='euclipy',
-  version='0.2.4',
+  version='0.2.5',
   description='A Euclidean Geometry based library',
   long_description=open('README.md').read(),
   long_description_content_type='text/markdown',
