@@ -1,6 +1,7 @@
 LICENSE.txt
 MANIFEST.in
 README.md
+requirements.txt
 setup.py
 doc/theorems.txt
 doc/changelog/0.0.1-changelog.txt
@@ -13,6 +14,7 @@ doc/changelog/0.2.1-changelog.txt
 doc/changelog/0.2.2-changelog.txt
 doc/changelog/0.2.3-changelog.txt
 doc/changelog/0.2.4-changelog.txt
+doc/changelog/0.2.5-changelog.txt
 euclipy/__init__.py
 euclipy/construct.py
 euclipy/tests.py
