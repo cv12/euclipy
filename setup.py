@@ -26,5 +26,5 @@ setup(
   classifiers=classifiers,
   keywords='geometry, math',
   packages=find_packages(include=['euclipy']),
-  install_requires=[''] 
+  install_requires=['sympy'] 
 )
