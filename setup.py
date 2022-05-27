@@ -21,10 +21,10 @@ setup(
             "Source Code": "https://github.com/joshuavaron/euclipy",
         },
   author='Joshua Varon',    
-  author_email='joshuavaron@gmail.com',
+  author_email='32440072+joshuavaron@users.noreply.github.com',
   license='MIT', 
   classifiers=classifiers,
   keywords='geometry, math',
   packages=find_packages(include=['euclipy']),
-  install_requires=[''] 
+  install_requires=['sympy'] 
 )
