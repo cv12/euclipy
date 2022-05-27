@@ -15,10 +15,12 @@ doc/changelog/0.2.2-changelog.txt
 doc/changelog/0.2.3-changelog.txt
 doc/changelog/0.2.4-changelog.txt
 doc/changelog/0.2.5-changelog.txt
+doc/changelog/0.2.6-changelog.txt
 euclipy/__init__.py
 euclipy/construct.py
 euclipy/tests.py
 euclipy.egg-info/PKG-INFO
 euclipy.egg-info/SOURCES.txt
 euclipy.egg-info/dependency_links.txt
+euclipy.egg-info/requires.txt
 euclipy.egg-info/top_level.txt
