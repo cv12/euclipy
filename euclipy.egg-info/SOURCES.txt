@@ -16,9 +16,16 @@ doc/changelog/0.2.3-changelog.txt
 doc/changelog/0.2.4-changelog.txt
 doc/changelog/0.2.5-changelog.txt
 doc/changelog/0.2.6-changelog.txt
+doc/changelog/0.2.7.changelog.txt
 euclipy/__init__.py
-euclipy/construct.py
+euclipy/core.py
+euclipy/geometric_objects.py
+euclipy/measure.py
+euclipy/polygon.py
+euclipy/registry.py
 euclipy/tests.py
+euclipy/theorems.py
+euclipy/tools.py
 euclipy.egg-info/PKG-INFO
 euclipy.egg-info/SOURCES.txt
 euclipy.egg-info/dependency_links.txt

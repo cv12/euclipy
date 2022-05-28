@@ -1,6 +1,6 @@
 from collections import defaultdict
-from .geometric_objects import Shape, Point, Segment, Angle
-from .registry import Registry
+from geometric_objects import Shape, Point, Segment, Angle
+from registry import Registry
 
 class Polygon(Shape):
     def __new__(cls, points: list):

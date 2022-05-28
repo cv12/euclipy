@@ -1,7 +1,7 @@
 import sympy
-from .core import Theorems
-from .geometric_objects import Triangle
-from .tools import pairs_in_iterable
+from core import Theorems
+from polygon import Triangle
+from tools import pairs_in_iterable
 
 
 def triangle_sum_theorem(triangle:Triangle) -> bool:

@@ -1,10 +1,10 @@
-from .core import *
-from .geometric_objects import *
-from .measure import *
-from .polygon import *
-from .registry import *
-from .theorems import *
-from .tools import *
+from core import *
+from geometric_objects import *
+from measure import *
+from polygon import *
+from registry import *
+from theorems import *
+from tools import *
 
 if __name__ == '__main__':
     import pprint

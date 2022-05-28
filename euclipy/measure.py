@@ -1,6 +1,5 @@
-from .core import Geometry
-from .registry import Registry
-from .tools import pairs_in_iterable
+from core import Geometry
+from registry import Registry
 
 class GeometricMeasure(Geometry):
     def __new__(cls, value=None) -> None:
