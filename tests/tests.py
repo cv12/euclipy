@@ -1,10 +1,12 @@
+import sys
+sys.path.append('../')
+
 from euclipy.core import *
-from euclipy.geometric_objects import *
 from euclipy.measure import *
 from euclipy.polygon import *
-from euclipy.registry import *
 from euclipy.theorems import *
 from euclipy.tools import *
+from euclipy.registry import *
 
 if __name__ == '__main__':
     import pprint
