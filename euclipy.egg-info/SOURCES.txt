@@ -18,6 +18,7 @@ doc/changelog/0.2.5-changelog.txt
 doc/changelog/0.2.6-changelog.txt
 doc/changelog/0.2.7.changelog.txt
 doc/changelog/0.2.8-changelog.txt
+doc/changelog/0.2.9-changelog.txt
 euclipy/__init__.py
 euclipy/core.py
 euclipy/geometric_objects.py

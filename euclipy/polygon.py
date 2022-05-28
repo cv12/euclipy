@@ -1,6 +1,6 @@
 from collections import defaultdict
-from geometric_objects import Shape, Point, Segment, Angle
-from registry import Registry
+from euclipy.geometric_objects import Shape, Point, Segment, Angle
+from euclipy.registry import Registry
 
 class Polygon(Shape):
     def __new__(cls, points: list):

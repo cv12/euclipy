@@ -1,5 +1,5 @@
-from core import Geometry
-from registry import Registry
+from euclipy.core import Geometry
+from euclipy.registry import Registry
 
 class GeometricMeasure(Geometry):
     def __new__(cls, value=None) -> None:

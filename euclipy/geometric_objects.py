@@ -1,6 +1,6 @@
-from core import Geometry
-from registry import Registry
-from measure import SegmentMeasure, AngleMeasure
+from euclipy.core import Geometry
+from euclipy.registry import Registry
+from euclipy.measure import SegmentMeasure, AngleMeasure
 
 class GeometricObject(Geometry):
     def __new__(cls, label):
