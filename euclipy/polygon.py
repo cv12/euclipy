@@ -1,6 +1,9 @@
+import sys
+sys.path.append("./")
+
 from collections import defaultdict
 from euclipy.geometric_objects import Shape, Point, Segment, Angle
-from euclipy.registry import Registry
+from euclipy.core import Registry
 
 class Polygon(Shape):
     def __new__(cls, points: list):

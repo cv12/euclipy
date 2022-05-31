@@ -1,20 +1,17 @@
 import sympy
-from euclipy.core import Theorems
+import sys
+sys.path.append("./")
+
+from euclipy.core import Registry, Expressions
 from euclipy.polygon import Triangle
 from euclipy.tools import pairs_in_iterable
 
 
 def triangle_sum_theorem(triangle:Triangle) -> bool:
-    unknown_angles = triangle.unknown_angles()
-    if len(unknown_angles) == 1:
-        unknown = unknown_angles[0]
-        known_sum = sum([a.measure.value for a in triangle.known_angles()])
-        m = sympy.Symbol(unknown.measure.label)
-        unknown.measure.value = sympy.solve(m + known_sum - 180, m)[0]
-        return True
-    return False
+    Expressions().add_expression(sum([a.measure.symbol for a in triangle.angles]) - 180)
+    return True
 
-Theorems().register_theorem(triangle_sum_theorem, 'Triangle')
+Registry().add_theorem(triangle_sum_theorem, 'Triangle')
 
 def isosceles_triangle_theorem(triangle: Triangle) -> bool:
     theorem_applied = False
@@ -33,4 +30,4 @@ def isosceles_triangle_theorem(triangle: Triangle) -> bool:
         theorem_applied = True
     return theorem_applied
 
-Theorems().register_theorem(isosceles_triangle_theorem, 'Triangle')
+Registry().add_theorem(isosceles_triangle_theorem, 'Triangle')

@@ -7,7 +7,6 @@ from euclipy.measure import *
 from euclipy.polygon import *
 from euclipy.theorems import *
 from euclipy.tools import *
-from euclipy.registry import *
 
 def test_point_identity():
     assert Point("A") is Point("A")
@@ -38,3 +37,6 @@ def test_angle_measure_inequality():
 
 def test_undefined_angle_measure():
     assert AngleMeasure().value == None
+
+def test_dummy():
+    assert True

@@ -1,14 +1,16 @@
-from euclipy.core import Geometry
-from euclipy.registry import Registry
+import sys
+sys.path.append("./")
+
+from euclipy.core import Geometry, Registry
 from euclipy.measure import SegmentMeasure, AngleMeasure
 
 class GeometricObject(Geometry):
     def __new__(cls, label):
-        entry = Registry().search_registry(cls._registry_key, label)
+        entry = Registry().find_object(cls._registry_key, label)
         if entry is None:
             cls.instance = super().__new__(cls)
             cls.instance.label = label
-            Registry().add_to_registry(cls.instance)
+            Registry().add_object(cls.instance)
             return cls.instance
         return entry
 

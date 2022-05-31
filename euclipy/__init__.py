@@ -1,3 +1,0 @@
-'''
-Euclipy initialization file
-'''
