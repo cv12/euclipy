@@ -15,6 +15,7 @@ docs/changelog/0.2.1-changelog.txt
 docs/changelog/0.2.10-changelog.txt
 docs/changelog/0.2.11-changelog.txt
 docs/changelog/0.2.12-changelog.txt
+docs/changelog/0.2.13-changelog.txt
 docs/changelog/0.2.2-changelog.txt
 docs/changelog/0.2.3-changelog.txt
 docs/changelog/0.2.4-changelog.txt
