@@ -5,6 +5,9 @@ __pycache__/
 # VS Code
 .vscode/
 
+# sdist
+dist/
+
 # C extensions
 *.so
 
