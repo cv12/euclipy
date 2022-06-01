@@ -74,3 +74,21 @@ class Triangle(Polygon):
             return [group for group in angle_map.values() if len(group) > 1][0]
         except IndexError:
             return []
+    
+    def dummy_fcn(self):
+        return "Dummy"
+
+    def is_right_triangle(self):
+        try:
+            right_angle = self.angles[[a.measure.value for a in self.angles].index(90)]
+            hypotenuse = 0
+            right_sides = []
+            for edge in self.edges:
+                if Angle.vertex(right_angle) not in edge.endpoints:
+                    hypotenuse = edge
+                else:
+                    right_sides.append(edge)
+            right_sides.append(hypotenuse)
+            return right_sides
+        except ValueError:
+            return False

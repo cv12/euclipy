@@ -1,1 +1,2 @@
 global-include *.txt *.py
+global-exclude *.pyc *.pyo *.pyd *.swp *.bak *~

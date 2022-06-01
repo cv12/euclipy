@@ -7,10 +7,10 @@ classifiers = [
   'License :: OSI Approved :: MIT License',
   'Programming Language :: Python :: 3'
 ]
- 
+
 setup(
   name='euclipy',
-  version='0.2.12',
+  version='0.2.13',
   description='A Euclidean Geometry based library',
   long_description=open('README.md').read(),
   long_description_content_type='text/markdown',

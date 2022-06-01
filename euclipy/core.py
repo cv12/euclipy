@@ -2,6 +2,7 @@ from collections import defaultdict
 import pprint
 import warnings
 import sympy
+import sympy.core.function
 
 class Registry:
     '''Singleton registry of:
@@ -98,6 +99,7 @@ class Expressions:
             m = Registry().search_measure_by_label(s.name)
             if m.value:
                 expression = expression.subs(s, m.value)
+        print(expression)
         if expression == 0:
             warnings.warn(f'{original_expression} contained no unknowns', stacklevel=3)
         else:
@@ -109,13 +111,18 @@ class Expressions:
     
     def solve(self):
         # Find systems with numbers of equations equal to the number of free variables and solve them, using sympy
-        solution = sympy.solve(self.expressions)
+        solution = sympy.solve(self.expressions, dict=True)
         # For all solutions with no free symbols, substitute the answer into the measure
-        for var, sol in solution.items():
-            if not sol.free_symbols:
-                # Find the measure that corresponds to the variable
-                var_measure = Registry().search_measure_by_label(var.name)
-                # Set the measure value to the solution
-                var_measure.value = sol
-                self.substitute(var, sol)
+        for system in solution:
+            for value in system.values():
+                if sympy.core.function._coeff_isneg(value):
+                    continue
+                else:
+                    for var, sol in system.items():
+                        if not sol.free_symbols:
+                            # Find the measure that corresponds to the variable
+                            var_measure = Registry().search_measure_by_label(var.name)
+                            # Set the measure value to the solution
+                            var_measure.value = sol
+                            self.substitute(var, sol)
         self.expressions = [e for e in self.expressions if e != 0]

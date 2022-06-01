@@ -1,0 +1,132 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html><head><title>Python: module euclipy.core</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+</head><body bgcolor="#f0f0f8">
+
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="heading">
+<tr bgcolor="#7799ee">
+<td valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial">&nbsp;<br><big><big><strong><a href="euclipy.html"><font color="#ffffff">euclipy</font></a>.core</strong></big></big></font></td
+><td align=right valign=bottom
+><font color="#ffffff" face="helvetica, arial"><a href=".">index</a><br><a href="file:c%3A%5Cusers%5Cjoshu%5Ceuclipy%5Ceuclipy%5Ccore.py">c:\users\joshu\euclipy\euclipy\core.py</a></font></td></tr></table>
+    <p></p>
+<p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#aa55cc">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Modules</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#aa55cc"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><table width="100%" summary="list"><tr><td width="25%" valign=top><a href="pprint.html">pprint</a><br>
+</td><td width="25%" valign=top><a href="sympy.html">sympy</a><br>
+</td><td width="25%" valign=top><a href="warnings.html">warnings</a><br>
+</td><td width="25%" valign=top></td></tr></table></td></tr></table><p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ee77aa">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Classes</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#ee77aa"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl>
+<dt><font face="helvetica, arial"><a href="builtins.html#object">builtins.object</a>
+</font></dt><dd>
+<dl>
+<dt><font face="helvetica, arial"><a href="euclipy.core.html#Expressions">Expressions</a>
+</font></dt><dt><font face="helvetica, arial"><a href="euclipy.core.html#Geometry">Geometry</a>
+</font></dt><dt><font face="helvetica, arial"><a href="euclipy.core.html#Registry">Registry</a>
+</font></dt></dl>
+</dd>
+</dl>
+ <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="Expressions">class <strong>Expressions</strong></a>(<a href="builtins.html#object">builtins.object</a>)</font></td></tr>
+    
+<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
+<td colspan=2><tt>Zero-valued&nbsp;expressions&nbsp;derived&nbsp;from&nbsp;theorems<br>&nbsp;</tt></td></tr>
+<tr><td>&nbsp;</td>
+<td width="100%">Methods defined here:<br>
+<dl><dt><a name="Expressions-add_expression"><strong>add_expression</strong></a>(self, expression)</dt></dl>
+
+<dl><dt><a name="Expressions-solve"><strong>solve</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="Expressions-substitute"><strong>substitute</strong></a>(self, var, sol)</dt></dl>
+
+<hr>
+Static methods defined here:<br>
+<dl><dt><a name="Expressions-__new__"><strong>__new__</strong></a>(cls)</dt><dd><tt>expressions&nbsp;is&nbsp;a&nbsp;list&nbsp;containing&nbsp;zero-valued&nbsp;expressions&nbsp;derived&nbsp;from&nbsp;theorems.<br>
+The&nbsp;expressions&nbsp;are&nbsp;constructed&nbsp;in&nbsp;sympy.&nbsp;Symbols&nbsp;representing&nbsp;measures&nbsp;use&nbsp;the&nbsp;label&nbsp;of&nbsp;the&nbsp;corresponding&nbsp;measures.:</tt></dd></dl>
+
+<dl><dt><a name="Expressions-measure_symbol"><strong>measure_symbol</strong></a>(measure)</dt></dl>
+
+<hr>
+Data descriptors defined here:<br>
+<dl><dt><strong>__dict__</strong></dt>
+<dd><tt>dictionary&nbsp;for&nbsp;instance&nbsp;variables&nbsp;(if&nbsp;defined)</tt></dd>
+</dl>
+<dl><dt><strong>__weakref__</strong></dt>
+<dd><tt>list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;object&nbsp;(if&nbsp;defined)</tt></dd>
+</dl>
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="Geometry">class <strong>Geometry</strong></a>(<a href="builtins.html#object">builtins.object</a>)</font></td></tr>
+    
+<tr><td bgcolor="#ffc8d8"><tt>&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%">Data descriptors defined here:<br>
+<dl><dt><strong>__dict__</strong></dt>
+<dd><tt>dictionary&nbsp;for&nbsp;instance&nbsp;variables&nbsp;(if&nbsp;defined)</tt></dd>
+</dl>
+<dl><dt><strong>__weakref__</strong></dt>
+<dd><tt>list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;object&nbsp;(if&nbsp;defined)</tt></dd>
+</dl>
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="Registry">class <strong>Registry</strong></a>(<a href="builtins.html#object">builtins.object</a>)</font></td></tr>
+    
+<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
+<td colspan=2><tt>Singleton&nbsp;registry&nbsp;of:<br>
+-&nbsp;<a href="#Geometry">Geometry</a>&nbsp;instances&nbsp;(GeometricObjects&nbsp;and&nbsp;GeometricMeasures)<br>
+-&nbsp;Theorems<br>&nbsp;</tt></td></tr>
+<tr><td>&nbsp;</td>
+<td width="100%">Methods defined here:<br>
+<dl><dt><a name="Registry-add_measure"><strong>add_measure</strong></a>(self, measure)</dt></dl>
+
+<dl><dt><a name="Registry-add_object"><strong>add_object</strong></a>(self, geometric_object)</dt></dl>
+
+<dl><dt><a name="Registry-add_theorem"><strong>add_theorem</strong></a>(self, theorem, applies_to)</dt></dl>
+
+<dl><dt><a name="Registry-find_object"><strong>find_object</strong></a>(self, registry_key, label)</dt></dl>
+
+<dl><dt><a name="Registry-get_auto_label"><strong>get_auto_label</strong></a>(self, geometry)</dt></dl>
+
+<dl><dt><a name="Registry-print_registry"><strong>print_registry</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="Registry-remove_measure"><strong>remove_measure</strong></a>(self, measure)</dt></dl>
+
+<dl><dt><a name="Registry-search_measure_by_class_and_value"><strong>search_measure_by_class_and_value</strong></a>(self, measure_cls, value)</dt></dl>
+
+<dl><dt><a name="Registry-search_measure_by_label"><strong>search_measure_by_label</strong></a>(self, label)</dt></dl>
+
+<dl><dt><a name="Registry-search_polygon"><strong>search_polygon</strong></a>(self, registry_key, points: list)</dt><dd><tt>Find&nbsp;polygon&nbsp;that&nbsp;shares&nbsp;points,&nbsp;regardless&nbsp;of&nbsp;point&nbsp;order</tt></dd></dl>
+
+<hr>
+Static methods defined here:<br>
+<dl><dt><a name="Registry-__new__"><strong>__new__</strong></a>(cls)</dt><dd><tt>objects&nbsp;and&nbsp;measures&nbsp;are&nbsp;dictionaries&nbsp;with:<br>
+-&nbsp;keys:&nbsp;registry&nbsp;key<br>
+-&nbsp;values:&nbsp;dictionaries&nbsp;mapping&nbsp;labels&nbsp;to&nbsp;registered&nbsp;objects/measures</tt></dd></dl>
+
+<hr>
+Data descriptors defined here:<br>
+<dl><dt><strong>__dict__</strong></dt>
+<dd><tt>dictionary&nbsp;for&nbsp;instance&nbsp;variables&nbsp;(if&nbsp;defined)</tt></dd>
+</dl>
+<dl><dt><strong>__weakref__</strong></dt>
+<dd><tt>list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;object&nbsp;(if&nbsp;defined)</tt></dd>
+</dl>
+</td></tr></table></td></tr></table>
+</body></html>

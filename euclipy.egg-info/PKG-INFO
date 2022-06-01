@@ -1,6 +1,6 @@
 Metadata-Version: 2.1
 Name: euclipy
-Version: 0.2.11
+Version: 0.2.12
 Summary: A Euclidean Geometry based library
 Home-page: 
 Author: Joshua Varon
@@ -37,28 +37,45 @@ pip install euclipy
 ```
 ## Sample Code (With Comments):
 ```py
-from euclipy import Point, Triangle, Registry
+from euclipy.geometric_objects import Point
+from euclipy.polygon import Triangle
+from euclipy.theorems import isosceles_triangle_theorem
+from euclipy.registry import Registry
 
-# Create 3 unique points
-A = Point('A')
-B = Point('B')
-C = Point('C')
+if __name__ == '__main__':
 
-# Create identical triangles
-T1 = Triangle([A, B, C])
-T2 = Triangle([B, C, A])
+    # Pretty print for registry
+    import pprint
+    pp = pprint.PrettyPrinter(indent=4)
 
-print(T1.edges)    # Prints line segments created by T1
-print(T1.angles)    # Prints angles created by T1
+    # Define points
+    A = Point('A')
+    B = Point('B')
+    C = Point('C')
 
-# Tries to create inconsistent triangle
-try:
-    T3 = Triangle([B, A, C])
-except:
-    print('Inconsistent triangle')
+    T1 = Triangle([A, B, C])
+    T2 = Triangle([B, C, A]) # Test for identity of two triangles expressed in different point
+    try:
+        T3 = Triangle([B, A, C]) # Test for inconsistent triangle
+    except:
+        print('Inconsistent triangle')
     
-# Prints all created objects
-print(Registry().entries)
+    # Assign angle values
+    T1.angles[0].measure.value = 60
+    T1.angles[1].measure.value = 60
+    T1.angles[2].measure.value = 60
+
+    # Assign side values
+    T1.edges[2].measure.value = 1
+
+    # Apply theorem
+    theorem_applied = isosceles_triangle_theorem(T1)
+
+    # Print results
+    print(f'isosceles_triangle_theorem ran: {theorem_applied}')
+
+    # Print registry
+    pp.pprint(Registry().entries)
 ```
 
 
