@@ -126,3 +126,5 @@ class Expressions:
                             var_measure.value = sol
                             self.substitute(var, sol)
         self.expressions = [e for e in self.expressions if e != 0]
+
+print('Registry:')
