@@ -7,6 +7,7 @@ from euclipy.measure import *
 from euclipy.polygon import *
 from euclipy.theorems import *
 from euclipy.tools import *
+from euclipy.exceptions import *
 
 def test_point_identity():
     assert Point("A") is Point("A")
@@ -38,5 +39,9 @@ def test_angle_measure_inequality():
 def test_undefined_angle_measure():
     assert AngleMeasure().value == None
 
-def test_dummy():
-    assert True
+def test_inconsistent_triangle():
+    Triangle([Point("A"), Point("B"), Point("C")])
+    try:
+        Triangle([Point("C"), Point("B"), Point("A")])
+    except InconsistentValues:
+        assert True

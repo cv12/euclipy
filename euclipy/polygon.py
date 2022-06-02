@@ -4,6 +4,7 @@ sys.path.append("./")
 from collections import defaultdict
 from euclipy.geometric_objects import Shape, Point, Segment, Angle
 from euclipy.core import Registry
+from euclipy.exceptions import InconsistentValues
 
 class Polygon(Shape):
     def __new__(cls, points: list):
@@ -18,7 +19,7 @@ class Polygon(Shape):
             if label == entry_label:
                 instance = entry
             else:
-                raise Exception #TODO: Create custom exception
+                raise InconsistentValues('Inconsistent triangles, consider using a different configuration of points')
         instance.edges = [Segment(set((points + points)[i:i+2])) for i in range(len(points))]
         instance.angles = [Angle(list(reversed((points + points)[i:i+3]))) for i in range(len(points))]
         return instance
@@ -74,12 +75,14 @@ class Triangle(Polygon):
             return [group for group in angle_map.values() if len(group) > 1][0]
         except IndexError:
             return []
-    
-    def dummy_fcn(self):
-        return "Dummy"
 
-    def is_right_triangle(self):
-        try:
+    def _is_right_triangle(self) -> bool:
+        return True if 90 in [a.measure.value for a in self.angles] else False
+
+    def right_triangle_components(self):
+        '''Returns a list of the right triangle components of the triangle, in order [leg, leg, hypotenuse]
+        '''
+        if self._is_right_triangle():
             right_angle = self.angles[[a.measure.value for a in self.angles].index(90)]
             hypotenuse = 0
             right_sides = []
@@ -90,5 +93,5 @@ class Triangle(Polygon):
                     right_sides.append(edge)
             right_sides.append(hypotenuse)
             return right_sides
-        except ValueError:
-            return False
+        else:
+            raise TypeError('Triangle is not right triangle')

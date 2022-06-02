@@ -1,7 +1,9 @@
 import sys
+
 sys.path.append("./")
 
 from euclipy.core import Geometry, Registry, Expressions
+from euclipy.exceptions import InconsistentValues
 
 class GeometricMeasure(Geometry):
     def __new__(cls, value=None) -> None:
@@ -31,7 +33,7 @@ class GeometricMeasure(Geometry):
             for measured_object in other_measure.measured_objects.union(self.measured_objects):
                 measured_object.measure = self
             if self.value is not None and other_measure.value is not None and self.value != other_measure.value:
-                raise ValueError
+                raise InconsistentValues(f'Cannot set {self} equal to {other_measure} because of inconsistent values')
             else:
                 self._value = self.value or other_measure.value
             self.measured_objects = self.measured_objects.union(other_measure.measured_objects)

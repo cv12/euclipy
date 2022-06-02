@@ -99,7 +99,6 @@ class Expressions:
             m = Registry().search_measure_by_label(s.name)
             if m.value:
                 expression = expression.subs(s, m.value)
-        print(expression)
         if expression == 0:
             warnings.warn(f'{original_expression} contained no unknowns', stacklevel=3)
         else:

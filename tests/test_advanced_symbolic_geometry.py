@@ -45,7 +45,3 @@ def test_pythagorean_theorem():
     pythagorean_theorem(T1)
     Expressions().solve()
     assert T1.edges[2].measure.value == 4
-    
-test_sum_theorem()
-test_isosceles_triangle_theorem()
-test_pythagorean_theorem()

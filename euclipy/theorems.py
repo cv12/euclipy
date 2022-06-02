@@ -14,11 +14,9 @@ def triangle_sum_theorem(triangle:Triangle) -> bool:
 Registry().add_theorem(triangle_sum_theorem, 'Triangle')
 
 def pythagorean_theorem(triangle:Triangle) -> bool:
-    is_right_triangle = Triangle.is_right_triangle(triangle)
-    if is_right_triangle is not False:
-        print(is_right_triangle)
-        Expressions().add_expression(is_right_triangle[0].measure.symbol**2 + is_right_triangle[1].measure.symbol**2 - is_right_triangle[2].measure.symbol**2)
-        return True
+    right_triangle_components = Triangle.right_triangle_components(triangle)
+    Expressions().add_expression(right_triangle_components[0].measure.symbol**2 + right_triangle_components[1].measure.symbol**2 - right_triangle_components[2].measure.symbol**2)
+    return True
 
 Registry().add_theorem(pythagorean_theorem, 'Triangle')
 

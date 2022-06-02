@@ -17,7 +17,7 @@ setup(
   url='',
   project_urls={
             #"Bug Tracker": "",
-            "Documentation": "https://github.com/joshuavaron/euclipy/blob/main/doc/documentation.md",
+            "Documentation": "https://joshuavaron.github.io/euclipy/",
             "Source Code": "https://github.com/joshuavaron/euclipy",
         },
   author='Joshua Varon',    
