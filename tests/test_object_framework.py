@@ -1,47 +1,46 @@
 import sys
 sys.path.append('../')
+
 import pytest
 
 from euclipy.core import *
 from euclipy.measure import *
 from euclipy.polygon import *
-from euclipy.theorems import *
 from euclipy.tools import *
 from euclipy.exceptions import *
 
-def test_point_identity():
-    assert Point("A") is Point("A")
+def test():
+    assert(Point('A') is Point('A'))
+    assert(Segment('B A') is Segment('A B'))
+    assert(Triangle("C A B") is Triangle("A B C"))
+    Segment('A B').measure = 1
+    Segment('A C').measure = Segment('A B').measure
+    assert(Segment('A B').measure is Segment('A C').measure)
+    assert(Segment('A B').measure.measured_objects == Segment('A C').measure.measured_objects)
+    #TODO: Fix for none
+    assert(Theorem() is Theorem())
+    Triangle("A B C").triangle_sum_theorem()
+    Triangle('A B C').angles[0].measure = 30
+    Triangle('A B C').angles[1].measure = 60
+    Theorem().solve()
+    assert(Triangle('A B C').angles[2].measure.value == 90)
+    assert(Triangle('A B C').is_right_triangle())
+    Segment('A B').measure = 5
+    Triangle('A B C').pythagorean_theorem()
+    Theorem().solve()
+    print(Segment('B C').measure.value)
+    Segment('A B').intersects(Segment('B C'), 'D')
 
-def test_point_inquality():
-    assert Point("A") is not Point("B")
+#print(Triangle('A B C').angles[2].measure)
+Triangle('A B C')
+Angle("C B A").measure = 90
+#print(Segment('C A').measure)
+# Triangle('A B C').angles[2].measure = 30
+Segment('B C').measure = 1
+Segment('C A').measure = 2
+Triangle('A B C').sine_definitions()
+Triangle('A B C').solver.solve()
+print(Segment("B C").measure.value)
 
-def test_segment_identity():
-    assert Segment([Point("A"), Point("B")]) is Segment([Point("A"), Point("B")])
-
-def test_segment_inequality():
-    assert Segment([Point("A"), Point("B")]) is not Segment([Point("B"), Point("C")])
-
-def test_segment_measure_identity():
-    assert SegmentMeasure(1) is SegmentMeasure(1)
-
-def test_segment_measure_inequality():
-    assert SegmentMeasure(1) is not SegmentMeasure(2)
-
-def test_undefined_segment_measure():
-    assert SegmentMeasure().value == None
-
-def test_angle_measure_identity():
-    assert AngleMeasure(60) is AngleMeasure(60)
-
-def test_angle_measure_inequality():
-    assert AngleMeasure(60) is not AngleMeasure(90)
-
-def test_undefined_angle_measure():
-    assert AngleMeasure().value == None
-
-def test_inconsistent_triangle():
-    Triangle([Point("A"), Point("B"), Point("C")])
-    try:
-        Triangle([Point("C"), Point("B"), Point("A")])
-    except InconsistentValues:
-        assert True
+# Theorem.print_order()
+# #print(Angle("B A C").measure.value)

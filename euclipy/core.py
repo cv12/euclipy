@@ -1,127 +1,308 @@
-from collections import defaultdict
-import pprint
-import warnings
+from collections import namedtuple, defaultdict
+from functools import wraps
+import inspect
 import sympy
-import sympy.core.function
+from .tools import euclicache
+from .measure import Measure
 
-class Registry:
-    '''Singleton registry of:
-        - Geometry instances (GeometricObjects and GeometricMeasures)
-        - Theorems
-    '''
-    def __new__(cls):
-        '''objects and measures are dictionaries with:
-            - keys: registry key
-            - values: dictionaries mapping labels to registered objects/measures
-        '''
-        if not hasattr(cls, 'instance'):
-            cls.instance = super(Registry, cls).__new__(cls)
-            cls.instance.objects = defaultdict(dict)
-            cls.instance.measures = defaultdict(dict)
-            cls.instance.theorems = defaultdict(list)
-            cls.instance.auto_label_counter = defaultdict(int)
+LABEL_DELIMITER = ' '
+
+SubstitutionRecord = namedtuple('SubstitutionRecord', ['symbol', 'substituted_by', 'in_expression', 'result'])
+
+class TracedExpression:
+    def __init__(self, expr, from_bound_method, **kwargs):
+        """from_bound_method is a @theorem-docorated bound method of a GeometricObject instance which is giving rise to expr (an expression which is a sympy.Expr instance)."""
+        self.original_expr = expr # Original expression (when istantiated and inserted into the Solver); will not be modified
+        self.expr = expr # Expressions may evolve during the solving process through substitutions; self.expr holds the current expression
+        self.from_bound_method = from_bound_method
+        self.obj = from_bound_method.__self__ # The GeometricObject instance whose bound @theorem-decorated method is giving rise to expr
+        self.theorem = from_bound_method.__name__ # The name of the @theorem-decorated method
+        self.params = kwargs # Dictionary of parameters that the @theorem-decorated method has used along with its self to create the expression
+        self.title = from_bound_method._title # The title of the @theorem-decorated method
+        self.doc = from_bound_method.__doc__ # The docstring of the @theorem-decorated method, used to describe the theorem
+        self.substitutions = [] # List of SubstitutionRecords describing substitutions performed on the expression (from original_expr to expr)
+        self.solved = False # Whether the expression evaluates to zero
+
+    def substitute(self, x, y):
+        """Substitute x for y in the expression (self.expr).
+        Return a SubstitutionRecord describing the substitution if the substitution chaneged the expression (i.e. the free symbol being substituted was in the expression).
+        Return None if the substitution did not change the expression (i.e. the free symbol being substituted was not in the expression)."""
+        result = self.expr.subs(x, y)
+        if result != self.expr: # i.e. substitution changed the expression
+            # Keep track of ther performed substitution
+            substitution_record = SubstitutionRecord(x, y, self.expr, result)
+            self.substitutions.append(substitution_record)
+            # Update the expression
+            self.expr = result
+            # Mark expression as solved if it evaluates to zero
+            if result == 0:
+                self.solved = True
+            # TODO: Handle the case where the expression contains no free symbols but does not evaluate to zero.  This means that it is an inconsistent expression.
+            return substitution_record
+
+    def __repr__(self):
+        return f"{self.__class__.__name__}(expr={self.expr}, original_expr={self.original_expr}, obj={self.obj}, theorem='{self.theorem}', params={self.params}, substitutions={self.substitutions})"
+
+class Solver:
+    def __init__(self):
+        self.expressions = [] # List of TracedExpressions
+        self.substitutions = [] # List of SubstitutionRecords
+
+    def add_expression(self, expr, from_bound_method, **kwargs):
+        assert isinstance(expr, sympy.Expr)
+        self.expressions.append(TracedExpression(expr, from_bound_method, **kwargs))
+
+    def substitute(self, x, y):
+        for expr in self.expressions:
+            substitution_record = expr.substitute(x, y)
+            if substitution_record:
+                self.substitutions.append(substitution_record)
+
+    def solve(self):
+        """Solve expressions for positive values.
+        Raise exception if any variable has a unique non-positive solution.
+        Raise an exception if any variable with non-unique solutions has zero or more than one positive solutions."""
+        # Substitute values for measures with known values
+        for tracedexpr in self.expressions:
+            for measure in tracedexpr.expr.free_symbols:
+                if measure.value is not None:
+                    self.substitute(measure, measure.value)
+        solutions = sympy.solve([tracedexpr.expr for tracedexpr in self.expressions], dict=True)
+        uniques = set.intersection(*[set(sol.items()) for sol in solutions])
+        non_uniques = [set(sol.items()) - uniques for sol in solutions]
+        uniques = dict(uniques)
+        non_uniques = [dict(non_unique) for non_unique in non_uniques] # list of dicts with common keys
+        uniques_without_free_symbols = {k:v for k,v in uniques.items() if not v.free_symbols}
+        # TODO: Custom exception
+        assert all(e > 0 for e in uniques_without_free_symbols.values()), "All unique solutions must be positive"
+        non_uniques_without_free_symbols = [{k:v for k, v in sol.items() if not v.free_symbols} for sol in non_uniques]
+        solution_sets = defaultdict(set)
+        for d in non_uniques_without_free_symbols:
+            for k, v in d.items():
+                solution_sets[k].add(v)
+        non_uniques_solution_candidate = {k: {e for e in v if e > 0} for k, v in solution_sets.items()}
+        assert all(len(v) == 1 for v in non_uniques_solution_candidate.values()), "All variables must have exactly one positive solution"
+        non_uniques_solution = {k: v.pop() for k, v in non_uniques_solution_candidate.items()}
+        valid_solutions = uniques_without_free_symbols | non_uniques_solution
+        # Substitute valid_solutions for variables in expressions
+        for sym, val in valid_solutions.items():
+            self.substitute(sym, val)
+            sym.value = val
+                
+SOLVER = Solver()
+
+def has_theorems(cls):
+    cls._theorems = [method for method in [getattr(cls, methodname) for methodname in dir(cls)] if hasattr(method, '_is_theorem')]
+    cls.solver = SOLVER
+    return cls
+
+def theorem(title):
+    def function_decorator(f):
+        @wraps(f)
+        def wrapper(*args, **kwargs):
+            return f(*args, **kwargs)
+        wrapper._is_theorem = True
+        wrapper._title = title
+        return wrapper
+    return function_decorator
+
+class Point:
+    """
+    A class to represent a point.
+
+    ...
+
+    Attributes
+    ----------
+    label : str
+        the label of the point
+
+    Methods
+    -------
+    None
+
+    Inherits from
+    -------------
+    None
+    """
+
+    @euclicache
+    def __new__(cls, label) -> object:
+        cls.instance = super().__new__(cls)
+        cls.instance.label = label
         return cls.instance
-   
-    def add_object(self, geometric_object):
-        self.objects[geometric_object._registry_key][geometric_object.label] = geometric_object
-
-    def add_measure(self, measure):
-        self.measures[measure._registry_key][measure.label] = measure
     
-    def remove_measure(self, measure):
-        self.measures[measure._registry_key].pop(measure.label, None)
-
-    def add_theorem(self, theorem, applies_to):
-        self.theorems[applies_to].append(theorem)
-            
-    def get_auto_label(self, geometry):
-        self.auto_label_counter[geometry._registry_key] += 1
-        return f'{geometry._label_prefix}{self.auto_label_counter[geometry._registry_key]}'
-
-    def find_object(self, registry_key, label):
-        try:
-            return self.objects[registry_key][label]
-        except KeyError:
-            return None
-
-    def search_measure_by_class_and_value(self, measure_cls, value):
-        try:
-            return [m for m in self.measures[measure_cls._registry_key].values() if m.value == value][0]
-        except IndexError:
-            return None
-
-    def search_measure_by_label(self, label):
-        try:
-            return[m for key in self.measures for m in self.measures[key].values() if m.label == label][0]
-        except IndexError:
-            return None
-
-    def search_polygon(self, registry_key, points: list):
-        '''Find polygon that shares points, regardless of point order
-        '''
-        try:
-            matches = [p for p in iter(self.objects[registry_key].values()) if set(p.points) == set(points)]
-            return matches[0] if matches else None
-        except KeyError:
-            return None
-
-    def print_registry(self):
-        pprint.pprint(self.objects)
-        pprint.pprint(self.measures)
-        pprint.pprint(self.theorems)
-
-class Geometry:
-    @classmethod
-    @property
-    def _registry_key(cls):
-        return cls.__name__
-
-class Expressions:
-    '''
-    Zero-valued expressions derived from theorems
-    '''
-    def __new__(cls):
-        '''expressions is a list containing zero-valued expressions derived from theorems.
-        The expressions are constructed in sympy. Symbols representing measures use the label of the corresponding measures.:
-        '''
-        if not hasattr(cls, 'instance'):
-            cls.instance = super(Expressions, cls).__new__(cls)
-            cls.instance.expressions = list()
-        return cls.instance
+    def __repr__(self) -> str:
+        return f'Point({self.label})'
 
     @staticmethod
-    def measure_symbol(measure):
-        return sympy.Symbol(measure.label)
+    def canonical_label(label) -> str:
+        return label
 
-    def add_expression(self, expression):
-        original_expression = expression
-        for s in expression.free_symbols:
-            m = Registry().search_measure_by_label(s.name)
-            if m.value:
-                expression = expression.subs(s, m.value)
-        if expression == 0:
-            warnings.warn(f'{original_expression} contained no unknowns', stacklevel=3)
-        else:
-            self.expressions.append(expression)
+class GeometricObject:
+    """
+    A class to represent a geometric object.
 
-    def substitute(self, var, sol):
-        for i, e in enumerate(self.expressions):
-            self.expressions[i] = e.subs(var, sol)
+    ...
+
+    Attributes
+    ----------
+    measure : Measure
+        the measure of the geometric object
+    value : int
+        the value of the measure of the geometric object
+
+    Methods
+    -------
+    None
+
+    Inherits from
+    -------------
+    None
+    """
+    @staticmethod
+    def points_from_label(label: str) -> list[Point]:
+        return [Point(point_label) for point_label in label.split(LABEL_DELIMITER)]
+
+    @staticmethod
+    def label_from_points(points: list[Point]) -> str:
+        return LABEL_DELIMITER.join([point.label for point in points])
+
+    @classmethod
+    def from_points(cls, points: list) -> 'GeometricObject':
+        return cls.__new__(cls, cls.label_from_points(points))
+
+    def add_expression(self, expr, **kwargs):
+        from_bound_method = getattr(self, inspect.getframeinfo(inspect.currentframe().f_back).function)
+        self.solver.add_expression(expr, from_bound_method, **kwargs)
     
-    def solve(self):
-        # Find systems with numbers of equations equal to the number of free variables and solve them, using sympy
-        solution = sympy.solve(self.expressions, dict=True)
-        # For all solutions with no free symbols, substitute the answer into the measure
-        for system in solution:
-            for value in system.values():
-                if sympy.core.function._coeff_isneg(value):
-                    continue
+    def apply_all_theorems(self):
+        for theorem in self._theorems:
+            theorem(self)
+
+    @property
+    def measure(self) -> Measure:
+        try:
+            return self._measure
+        except AttributeError:
+            self._measure = Measure()
+            self.measure.measured_class = self.__class__
+            self._measure.add_measured_object(self)
+            return self._measure
+
+    @measure.setter
+    def measure(self, other_measure_or_value) -> None:
+        if isinstance(other_measure_or_value, Measure):
+            # Setting measure equal to another measure
+            other_measure = other_measure_or_value
+            try:
+                if self._measure is not other_measure:
+                    # Merge self.measured_objects into other_measure.measured_objects and set self's measure to the other measure.
+                    other_measure.measured_objects += self._measure.measured_objects
+                    self._measure = other_measure
+            except AttributeError:
+                # Measure has not been defined for self. Assign self's measure to other_measure.
+                self._measure = other_measure
+                other_measure.add_measured_object(self)
+        else:
+            # Setting measure equal to a value
+            value = other_measure_or_value
+            try:
+                self._measure.value = value
+            except AttributeError:
+                self._measure = Measure()
+                self._measure.measured_class = self.__class__
+                self._measure.add_measured_object(self)
+                self._measure.value = value
+            finally:
+                existing_measure_matching_value = self._measure.defined_measures.get(self._measure.value)
+                if existing_measure_matching_value is not None:
+                    self._measure = existing_measure_matching_value
                 else:
-                    for var, sol in system.items():
-                        if not sol.free_symbols:
-                            # Find the measure that corresponds to the variable
-                            var_measure = Registry().search_measure_by_label(var.name)
-                            # Set the measure value to the solution
-                            var_measure.value = sol
-                            self.substitute(var, sol)
-        self.expressions = [e for e in self.expressions if e != 0]
+                    self._measure.defined_measures[self._measure.value] = self._measure
+
+    @property
+    def value(self) -> int:
+        try:
+            return self._measure.value
+        except AttributeError:
+            self._measure = Measure()
+            self._measure.add_measured_object(self)
+            return self._measure.value
+
+    @classmethod
+    def canonical_label(cls, label) -> str:
+        return label
+
+class Segment(GeometricObject):
+    """
+    A class to represent a line segment.
+
+    ...
+
+    Attributes
+    ----------
+    label : str
+        the label of the segment
+    endpoints : list
+        the endpoints of the segment
+
+    Methods
+    -------
+    None
+
+    Inherits from
+    -------------
+    GeometricObject
+    """
+
+    _vertical_angles = []
+
+    @euclicache
+    def __new__(cls, label: str) -> object:
+        cls.instance = super().__new__(cls)
+        cls.instance.label = cls.canonical_label(label)
+        cls.instance.endpoints = cls.points_from_label(label)
+        cls.instance.intersections = []
+        return cls.instance
+
+    def __repr__(self) -> str:
+        return f'Segment({self.label} | {self.measure})'
+
+    @classmethod
+    def canonical_label(cls, label) -> str:
+        '''Sorts a point labels in Segment labels alphabetically.'''
+        return cls.label_from_points(sorted(cls.points_from_label(label), key=lambda point: point.label))
+
+    def intersects(self, segment, point: str) -> None:
+        self.intersections.append((segment, Point(point)))
+        segment.intersections.append((self, Point(point)))
+
+class Angle(GeometricObject):
+    """
+    A class to represent an angle.
+
+    ...
+
+    Attributes
+    ----------
+    label : str
+        the label of the angle
+
+    Methods
+    -------
+    None
+
+    Inherits from
+    -------------
+    GeometricObject
+    """
+    @euclicache
+    def __new__(cls, label: str) -> object:
+        cls.instance = super().__new__(cls)
+        cls.instance.vertices = cls.points_from_label(label)
+        cls.instance.label = cls.canonical_label(label)
+        return cls.instance
+
+    def __repr__(self) -> str:
+        return f'Angle({self.label} | {self.measure})'
