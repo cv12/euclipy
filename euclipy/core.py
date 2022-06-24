@@ -2,6 +2,8 @@ from collections import namedtuple, defaultdict
 from functools import wraps
 import inspect
 import sympy
+
+from euclipy.exceptions import InformationError
 from .tools import euclicache
 from .measure import Measure
 
@@ -37,7 +39,8 @@ class TracedExpression:
             # Mark expression as solved if it evaluates to zero
             if result == 0:
                 self.solved = True
-            # TODO: Handle the case where the expression contains no free symbols but does not evaluate to zero.  This means that it is an inconsistent expression.
+            elif len(result.free_symbols) == 0:
+                raise InformationError('One or more given facts are untrue.')
             return substitution_record
 
     def __repr__(self):
@@ -47,6 +50,15 @@ class Solver:
     def __init__(self):
         self.expressions = [] # List of TracedExpressions
         self.substitutions = [] # List of SubstitutionRecords
+
+    def __repr__(self):
+        str = ''
+        for expression in self.expressions:
+            str += f'Original Expression: {expression.original_expr} \nCurrent Expression: {expression.expr} \nObject: {expression.obj} \nTheorem: {expression.theorem} \nSubstitutions:'
+            for substitution in expression.substitutions:
+                str += f'\n\t{substitution}'
+            str += '\n'
+        return str[:-1]
 
     def add_expression(self, expr, from_bound_method, **kwargs):
         assert isinstance(expr, sympy.Expr)
@@ -73,8 +85,8 @@ class Solver:
         uniques = dict(uniques)
         non_uniques = [dict(non_unique) for non_unique in non_uniques] # list of dicts with common keys
         uniques_without_free_symbols = {k:v for k,v in uniques.items() if not v.free_symbols}
-        # TODO: Custom exception
-        assert all(e > 0 for e in uniques_without_free_symbols.values()), "All unique solutions must be positive"
+        if not all(e > 0 for e in uniques_without_free_symbols.values()):
+            raise InformationError('The given facts create an impossible solution(s).')
         non_uniques_without_free_symbols = [{k:v for k, v in sol.items() if not v.free_symbols} for sol in non_uniques]
         solution_sets = defaultdict(set)
         for d in non_uniques_without_free_symbols:
