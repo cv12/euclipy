@@ -1,13 +1,17 @@
 from collections import namedtuple, defaultdict
 from functools import wraps
 import inspect
+from sqlalchemy import except_all
 import sympy
+import networkx
 
-from euclipy.exceptions import InformationError
+
+from .exceptions import InformationError
 from .tools import euclicache
 from .measure import Measure
 
 LABEL_DELIMITER = ' '
+DIRECTED_GRAPH = networkx.DiGraph()
 
 SubstitutionRecord = namedtuple('SubstitutionRecord', ['symbol', 'substituted_by', 'in_expression', 'result'])
 
@@ -35,12 +39,16 @@ class TracedExpression:
             substitution_record = SubstitutionRecord(x, y, self.expr, result)
             self.substitutions.append(substitution_record)
             # Update the expression
+            self._expr = self.expr
             self.expr = result
             # Mark expression as solved if it evaluates to zero
             if result == 0:
                 self.solved = True
+                DIRECTED_GRAPH.add_node(result, solved=True)
             elif len(result.free_symbols) == 0:
                 raise InformationError('One or more given facts are untrue.')
+            else:
+                DIRECTED_GRAPH.add_node(result, order=(max(networkx.get_node_attributes(DIRECTED_GRAPH, 'order')[self._expr], networkx.get_node_attributes(DIRECTED_GRAPH, 'order')[y])) + 1)
             return substitution_record
 
     def __repr__(self):
@@ -62,6 +70,7 @@ class Solver:
 
     def add_expression(self, expr, from_bound_method, **kwargs):
         assert isinstance(expr, sympy.Expr)
+        DIRECTED_GRAPH.add_node(expr, order=1)
         self.expressions.append(TracedExpression(expr, from_bound_method, **kwargs))
 
     def substitute(self, x, y):
@@ -100,7 +109,8 @@ class Solver:
         for sym, val in valid_solutions.items():
             self.substitute(sym, val)
             sym.value = val
-                
+            DIRECTED_GRAPH.add_node(val)
+
 SOLVER = Solver()
 
 def has_theorems(cls):
@@ -204,6 +214,7 @@ class GeometricObject:
 
     @measure.setter
     def measure(self, other_measure_or_value) -> None:
+        # TODO: Traced
         if isinstance(other_measure_or_value, Measure):
             # Setting measure equal to another measure
             other_measure = other_measure_or_value
@@ -227,6 +238,7 @@ class GeometricObject:
                 self._measure.add_measured_object(self)
                 self._measure.value = value
             finally:
+                DIRECTED_GRAPH.add_node(value, order=1)
                 existing_measure_matching_value = self._measure.defined_measures.get(self._measure.value)
                 if existing_measure_matching_value is not None:
                     self._measure = existing_measure_matching_value

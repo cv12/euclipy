@@ -1,5 +1,5 @@
 from .tools import euclicache, pairs_in_iterable
-from .core import Segment, Angle, GeometricObject, theorem, has_theorems
+from .core import Segment, Angle, GeometricObject, theorem, has_theorems, DIRECTED_GRAPH
 from sympy import pi, asin, acos
 
 @has_theorems

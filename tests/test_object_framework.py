@@ -31,6 +31,13 @@ def test_theorem_application():
     Triangle('A B C').angles[0].measure = 30
     Triangle('A B C').angles[1].measure = 60
     Triangle('A B C').solver.solve()
-    print(Triangle('A B C').solver)
+    print(SOLVER.expressions)
+    Triangle("A B C").pythagorean_theorem()
     assert(Triangle('A B C').angles[2].measure.value == 90)
     assert(Triangle('A B C').is_right_triangle())
+    print(DIRECTED_GRAPH.nodes(data=True))
+
+test_theorem_application()
+
+# TODO: IMPORTANT - the node that prints "(90, {})" needs to print "(90, {4}", 
+# which means there is a node representing the information that a measure was evaluated to 90, in order 4
