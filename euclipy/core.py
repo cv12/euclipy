@@ -1,8 +1,6 @@
 from collections import namedtuple, defaultdict
 from functools import wraps
 import inspect
-from cv2 import trace
-from sqlalchemy import except_all
 import sympy
 import networkx
 
@@ -49,6 +47,7 @@ class TracedExpression:
                 raise InformationError('One or more given facts are untrue.')
             else:
                 DIRECTED_GRAPH.add_edge(self._expr, result, rule_applied=f'Substituted {y} for {x}')
+                DIRECTED_GRAPH.add_edge((y - x), result)
             return substitution_record
 
     def __repr__(self):
@@ -245,7 +244,8 @@ class GeometricObject:
                 self._measure.add_measured_object(self)
                 self._measure.value = value
             finally:
-                DIRECTED_GRAPH.add_edge('Proof', value, rule_applied='Given fact')
+                _expr = value - self._measure
+                DIRECTED_GRAPH.add_edge('Proof', _expr, rule_applied='Given fact')
                 existing_measure_matching_value = self._measure.defined_measures.get(self._measure.value)
                 if existing_measure_matching_value is not None:
                     self._measure = existing_measure_matching_value

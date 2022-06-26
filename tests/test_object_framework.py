@@ -36,7 +36,3 @@ def test_theorem_application():
     Triangle("A B C").pythagorean_theorem()
     assert(Triangle('A B C').angles[2].measure.value == 90)
     assert(Triangle('A B C').is_right_triangle())
-    SOLVER.proof_record(Triangle('A B C').angles[2].measure - 90)
-
-
-test_theorem_application()
