@@ -1,6 +1,7 @@
 from collections import namedtuple, defaultdict
 from functools import wraps
 import inspect
+from cv2 import trace
 from sqlalchemy import except_all
 import sympy
 import networkx
@@ -44,11 +45,10 @@ class TracedExpression:
             # Mark expression as solved if it evaluates to zero
             if result == 0:
                 self.solved = True
-                DIRECTED_GRAPH.add_node(result, solved=True)
             elif len(result.free_symbols) == 0:
                 raise InformationError('One or more given facts are untrue.')
             else:
-                DIRECTED_GRAPH.add_node(result, order=(max(networkx.get_node_attributes(DIRECTED_GRAPH, 'order')[self._expr], networkx.get_node_attributes(DIRECTED_GRAPH, 'order')[y])) + 1)
+                DIRECTED_GRAPH.add_edge(self._expr, result, rule_applied=f'Substituted {y} for {x}')
             return substitution_record
 
     def __repr__(self):
@@ -70,7 +70,7 @@ class Solver:
 
     def add_expression(self, expr, from_bound_method, **kwargs):
         assert isinstance(expr, sympy.Expr)
-        DIRECTED_GRAPH.add_node(expr, order=1)
+        DIRECTED_GRAPH.add_edge('Proof', expr, rule_applied='Given fact')
         self.expressions.append(TracedExpression(expr, from_bound_method, **kwargs))
 
     def substitute(self, x, y):
@@ -78,6 +78,13 @@ class Solver:
             substitution_record = expr.substitute(x, y)
             if substitution_record:
                 self.substitutions.append(substitution_record)
+
+    def proof_record(self, target):
+        a = networkx.shortest_path(DIRECTED_GRAPH, 'Proof', target)
+        pathGraph = networkx.path_graph(a)
+        for edge in pathGraph.edges():
+            before, after = edge
+            print(f'({before} -> {after})', DIRECTED_GRAPH.edges[edge[0], edge[1]])
 
     def solve(self):
         """Solve expressions for positive values.
@@ -88,6 +95,7 @@ class Solver:
             for measure in tracedexpr.expr.free_symbols:
                 if measure.value is not None:
                     self.substitute(measure, measure.value)
+        _expr = tracedexpr.expr
         solutions = sympy.solve([tracedexpr.expr for tracedexpr in self.expressions], dict=True)
         uniques = set.intersection(*[set(sol.items()) for sol in solutions])
         non_uniques = [set(sol.items()) - uniques for sol in solutions]
@@ -109,7 +117,6 @@ class Solver:
         for sym, val in valid_solutions.items():
             self.substitute(sym, val)
             sym.value = val
-            DIRECTED_GRAPH.add_node(val)
 
 SOLVER = Solver()
 
@@ -238,7 +245,7 @@ class GeometricObject:
                 self._measure.add_measured_object(self)
                 self._measure.value = value
             finally:
-                DIRECTED_GRAPH.add_node(value, order=1)
+                DIRECTED_GRAPH.add_edge('Proof', value, rule_applied='Given fact')
                 existing_measure_matching_value = self._measure.defined_measures.get(self._measure.value)
                 if existing_measure_matching_value is not None:
                     self._measure = existing_measure_matching_value
