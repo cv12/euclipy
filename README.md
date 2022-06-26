@@ -15,14 +15,14 @@
 
   
 
-- Create points, line segments, angles, and triangles with Point(), Segment(), Angle(), and Triangle(), respectively
+- Create symbolic geometric objects (Triangle(), Segment(), Angle(), etc.)
 
 - Implicitly defines segments and angles created by polygon constructions
 
-- Keeps a registry of all defined objects, implicit or explicit
+- Keeps a log of steps taken to prove distinct facts
 
 
-![Sample Output](../tests/test_object_framework.png)
+![Sample Output](https://github.com/joshuavaron/euclipy/blob/main/tests/proof_output_framework.png?raw=true)
 
   
 
